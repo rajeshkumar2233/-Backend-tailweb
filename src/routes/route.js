@@ -1,27 +1,37 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const { createStudent, getStudents, getIndividualStudent, updateStudent, deleteStudent } = require("../controller/markController");
-const { createTeacher, login } = require("../controller/teacherController");
-const { authentication, authorization } = require("../middlewares/auth")
+const userController = require("../controllers/teacherController");
+const markController = require("../controllers/markController");
+const authentication = require("../middleware/auth")
+
+
+
+router.post('/createUser', userController.createUser);
+
+router.post('/userLogin', userController.userLogin);
+
+router.post('/filledMarks/:teacherId', authentication.authentication, authentication.authorization, markController.filledMarks);
+
+router.put("/updatestudent/:teacherId/:studentId", authentication.authentication, authentication.authorization, markController.updateStudent)
+
+router.get("/getStudents/:teacherId", authentication.authentication, markController.getStudent)
+
+router.delete("/deleteStudents/:teacherId/:studentId", authentication.authentication, authentication.authorization, markController.deleteStudent)
 
 
 
 
-router.get("/testme", (req, res) => {
-    res.status(200).send({ status: true, msg: "hello Backend" })
-})
+//API for wrong route-of-API
+router.all("/*", function (req, res) {
+  res.status(400).send({
+    status: false,
+    message: "Path Not Found",
+  });
+});
 
 
 
-router.post("/register", createTeacher);
-router.post("/login", login);
-router.get("/students", authentication, getStudents);
-router.get("/students/:userId", authentication, authorization, getIndividualStudent)
-router.put("/students/:userId", authentication, authorization, updateStudent)
-router.delete("/students/:userId", authentication, authorization, deleteStudent)
-router.post("/students/createStudent", authentication, createStudent)
 
 
-module.exports = router
 
-
+module.exports = router;
